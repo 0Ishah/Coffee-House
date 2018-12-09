@@ -22,7 +22,7 @@ namespace Coffee_House
 
 
         private const int SCREEN_WIDTH = 800;
-        private const int SCREEN_HEIGHT = 640;
+        private const int SCREEN_HEIGHT = 480;
 
         //Graphics design elements
         private Rectangle shopRec;
@@ -161,7 +161,7 @@ namespace Coffee_House
                     // Move all the customers except the first to their destanation behind the first
                     if (!outsideCurrent.GetNext().IsAtDestination())
                     {
-                        outsideCurrent.GetNext().DestinationPosition = Information.OUTSIDE_LINE_START + new Vector2(Information.SPACE_BETWEEN_CUSTOMERS * i, 0); //TODO: Magic numbers
+                        outsideCurrent.GetNext().DestinationPosition = Information.OUTSIDE_LINE_START + new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + 40) * (i + 1), 0); //TODO: Magic numbers
                         outsideCurrent.GetNext().Move();
                     }
                     outsideCurrent = outsideCurrent.GetNext();

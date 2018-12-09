@@ -11,7 +11,7 @@ namespace Coffee_House.Functionality
     {
         public const int MAX_PEOPLE_INSIDE = 20;
 
-        public static readonly Vector2 CUSTOMER_SPAWN_POS = new Vector2(700, 440);//TODO: Move outside of viewport
+        public static readonly Vector2 CUSTOMER_SPAWN_POS = new Vector2(700, 500);//TODO: Move outside of viewport
 
         public static readonly Vector2 OUTSIDE_LINE_START = new Vector2(180, 420);
 

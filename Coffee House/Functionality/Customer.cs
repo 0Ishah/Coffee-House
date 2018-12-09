@@ -71,6 +71,8 @@ namespace Coffee_House.Functionality
             {
                 Vector2 dir = DestinationPosition - Position;
                 dir.Normalize();
+                dir.X = Convert.ToInt32(dir.X);
+                dir.Y = Convert.ToInt32(dir.Y);
 
                 Position += dir * Information.CUSTOMER_MOVE_SPEED;
             }
