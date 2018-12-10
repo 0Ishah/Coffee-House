@@ -15,6 +15,7 @@ namespace Coffee_House.Functionality
         public string Name { get; }
         public double CreationTime { get; }
         public int TimeInQueue { get; set; } = 0;
+        public int TravelPoint { get; set; } = 0;
         public Vector2 DestinationPosition { get; set; }
         public Vector2 Position { get; private set; } = new Vector2(Information.CUSTOMER_SPAWN_POS.X, Information.CUSTOMER_SPAWN_POS.Y);
 

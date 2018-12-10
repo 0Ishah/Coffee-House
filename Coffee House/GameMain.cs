@@ -15,7 +15,7 @@ namespace Coffee_House
 {
     public class GameMain : Game
     {
-        //System elements
+        // System elements
         private GraphicsDeviceManager graphics;
         private SpriteBatch spriteBatch;
         private Random rng = new Random();
@@ -24,7 +24,7 @@ namespace Coffee_House
         private const int SCREEN_WIDTH = 800;
         private const int SCREEN_HEIGHT = 480;
 
-        //Graphics design elements
+        // Graphics design elements
         private Rectangle shopRec;
         private Rectangle[] casheerRec = new Rectangle[3];
 
@@ -36,7 +36,7 @@ namespace Coffee_House
         private Texture2D shopTexture;
         private Texture2D customerTexture;
 
-        //Simulation related elements
+        // Simulation related elements
         private double currentSimulationTime;
 
         private const int SIMULATION_UPDATE_TIME = 1;
@@ -88,10 +88,10 @@ namespace Coffee_House
 
             //CODE HERE
 
-            //Initialize design rectangles
+            // Initialize design rectangles
             shopRec = new Rectangle(0, 0, 800, 480);//TODO: Change magic numbers
 
-            //Load design textures
+            // Load design textures
             shopTexture = Content.Load<Texture2D>("Sprites/shop");
             customerTexture = Content.Load<Texture2D>("Sprites/customer");
         }
@@ -111,29 +111,29 @@ namespace Coffee_House
         {
             //CODE HERE
 
-            //Count all of the timers
+            // Count all of the timers
             customerSpawnCounter += gameTime.ElapsedGameTime.TotalSeconds;
             simulationUpdateCounter += gameTime.ElapsedGameTime.TotalSeconds;
             currentSimulationTime += gameTime.ElapsedGameTime.TotalSeconds;
 
-            //Spawn a new customer and place into outside queue every 3 seconds
+            // Spawn a new customer and place into outside queue every 3 seconds
             if (customerSpawnCounter >= Information.CUSTOMER_SPAWN_INTERVAL)
             {
                 int randomType = rng.Next(0, Information.POSSIBLE_FOODS);
                 int randomDish = rng.Next(0, Information.POSSIBLE_DISHES);
                 switch (randomType)
                 {
-                    //Coffee
+                    // Coffee
                     case 0:
                         numCurrentCoffee++;
                         outsideQueue.Enqueue(new Customer(randomType, Information.COFFEE_TYPES[randomDish] + " " + numCurrentCoffee, currentSimulationTime));
                         break;
-                    //Foods
+                    // Foods
                     case 1:
                         numCurrentFood++;
                         outsideQueue.Enqueue(new Customer(randomType, Information.FOOD_TYPES[randomDish] + " " + numCurrentFood, currentSimulationTime));
                         break;
-                    //Combos
+                    // Combos
                     case 2:
                         numCurrentCombo++;
                         outsideQueue.Enqueue(new Customer(randomType, Information.COMBO_TYPES[randomDish] + " " + numCurrentCombo, currentSimulationTime));
@@ -145,7 +145,7 @@ namespace Coffee_House
                 customerSpawnCounter = 0;
             }
 
-            //Move customers in the outside line
+            // Move customers in the outside line
             if (!outsideQueue.IsEmpty())
             {
                 outsideCurrent = outsideQueue.Peek();
@@ -169,30 +169,74 @@ namespace Coffee_House
                 outsideCurrent = null;
             }
 
-            //Move customers into the inside queue if there are less then 20 peopel inside
-            if (insideQueue.Count < Information.MAX_PEOPLE_INSIDE && !outsideQueue.IsEmpty() && outsideQueue.Peek().IsAtDestination() && 2 == 1) //TODO: 2=1
+            // Move customer in the inside queue
+            if (!insideQueue.IsEmpty())
+            {   
+                insideCurrent = insideQueue.Peek();
+                for (int i = 0; i < outsideQueue.Count; i++)
+                {
+                    switch (insideCurrent.TravelPoint)
+                    {
+                        case (0):
+                            insideCurrent.DestinationPosition = Information.INSIDE_QUEUE_TRAVEL_POSINTS[0];
+                            insideCurrent.Move();
+                            if (insideCurrent.IsAtDestination())
+                            {
+                                insideCurrent.TravelPoint = 1;
+                            }
+                            break;
+                        case (1):
+                            insideCurrent.DestinationPosition = Information.INSIDE_QUEUE_TRAVEL_POSINTS[1];
+                            insideCurrent.Move();
+                            if (insideCurrent.IsAtDestination())
+                            {
+                                insideCurrent.TravelPoint = 2;
+                            }
+                            break;
+                        case (2):
+                            insideCurrent.DestinationPosition = Information.INSIDE_QUEUE_TRAVEL_POSINTS[2];
+                            insideCurrent.Move();
+                            if (insideCurrent.IsAtDestination() && i < 9)
+                            {
+                                insideCurrent.TravelPoint = 3;
+                            }
+                            break;
+                        case (3):
+                            insideCurrent.DestinationPosition = Information.INSIDE_LINE_START;
+                            insideCurrent.Move();
+                            if (insideCurrent.IsAtDestination())
+                            {
+                                insideCurrent.TravelPoint = 4;
+                            }
+                            break;
+                    } 
+                }
+            }
+
+            // Move customers into the inside queue if there are less then 20 peopel inside
+            if (insideQueue.Count < Information.MAX_PEOPLE_INSIDE && !outsideQueue.IsEmpty() && outsideQueue.Peek().IsAtDestination())
             {
                 insideQueue.Enqueue(outsideQueue.Dequeue());
             }
 
-            //Move the customers to the nest avalible casheer
-            if (!insideQueue.IsEmpty() && insideQueue.Peek().IsAtDestination())
+            // Move the customers to the nest avalible casheer
+            if (!insideQueue.IsEmpty() && insideQueue.Peek().IsAtDestination() && 2 == 1) //TODO: 2==1
             {
                 for (int i = 0; i < casheers.Length; i++)
                 {
                     if (!casheers[i].IsOccupied && casheers[i].ContainsCustomer())
                     {
-                        //If the serving process was finished and new customer came
+                        // If the serving process was finished and new customer came
                         if (casheers[i].ContainsCustomer())
                         {
-                            //Add the processed custoemr to the list and calculate its time in queue
+                            // Add the processed custoemr to the list and calculate its time in queue
                             casheers[i].CurrentCustomer.TimeInQueue = Convert.ToInt32(currentSimulationTime - casheers[i].CurrentCustomer.CreationTime);
-                            //casheers[i].CurrentCustomer.IsWaiting = false; 
-                            //TODO: change this
+
+                            // TODO: change this
                             processedCustomers.Add(casheers[i].CurrentCustomer);
                             casheers[i].StartProcessing(insideQueue.Dequeue());
                         }
-                        //Else if this is the first customer of the day
+                        // Else if this is the first customer of the day
                         else if (!casheers[i].ContainsCustomer())
                         {
                             casheers[i].StartProcessing(insideQueue.Dequeue());
@@ -202,7 +246,7 @@ namespace Coffee_House
                 }
             }
 
-            //Update all fo the casheers
+            // Update all fo the casheers
             if (simulationUpdateCounter >= SIMULATION_UPDATE_TIME)
             {
                 foreach (Casheer casheer in casheers)
@@ -232,6 +276,7 @@ namespace Coffee_House
 
             spriteBatch.Draw(shopTexture, shopRec, Color.White);
 
+            // Draw outside queue
             if (!outsideQueue.IsEmpty())
             {
                 outsideCurrent = outsideQueue.Peek();
@@ -241,6 +286,18 @@ namespace Coffee_House
                     outsideCurrent = outsideCurrent.GetNext();
                 }
                 outsideCurrent = null;
+            }
+
+            // Draw inside queue
+            if (!insideQueue.IsEmpty())
+            {
+                insideCurrent = insideQueue.Peek();
+                for (int i = 0; i < insideQueue.Count; i++)
+                {
+                    spriteBatch.Draw(customerTexture, new Rectangle((int)insideCurrent.Position.X, (int)insideCurrent.Position.Y, 40, 40), Color.White); //TODO: Magic mumbers and ugly
+                    insideCurrent = insideCurrent.GetNext();
+                }
+                insideCurrent = null;
             }
 
             spriteBatch.End();

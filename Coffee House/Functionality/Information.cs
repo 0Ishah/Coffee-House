@@ -11,17 +11,18 @@ namespace Coffee_House.Functionality
     {
         public const int MAX_PEOPLE_INSIDE = 20;
 
-        public static readonly Vector2 CUSTOMER_SPAWN_POS = new Vector2(700, 500);//TODO: Move outside of viewport
+        public static readonly Vector2 CUSTOMER_SPAWN_POS = new Vector2(400, 500);//TODO: Move outside of viewport
 
         public static readonly Vector2 OUTSIDE_LINE_START = new Vector2(180, 420);
 
         public static readonly Vector2 INSIDE_LINE_START = new Vector2(330, 250);
 
-        public static readonly Vector2[] INSIDE_QUEUE_KEY_POINTS = new Vector2[]
+        public static readonly Vector2[] INSIDE_QUEUE_TRAVEL_POSINTS = new Vector2[]
         {
-            new Vector2(315,320),
-            new Vector2(730,320),
-            new Vector2(730,250)
+            new Vector2(130,420),// First point outside of the shop
+            new Vector2(130,320),// Inside queue point
+            new Vector2(730,320),// Inside queue point
+            new Vector2(730,250) // Inside queue point
         };
 
         public const int SPACE_BETWEEN_CUSTOMERS = 5;
