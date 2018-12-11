@@ -44,6 +44,7 @@ namespace Coffee_House.Functionality
                     front = null;
                 }
                 Count--;
+                temp.SetNext(null);
                 return temp;
             }
             return null;
