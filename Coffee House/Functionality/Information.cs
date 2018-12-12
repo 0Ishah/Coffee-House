@@ -26,9 +26,9 @@ namespace Coffee_House.Functionality
 
         public static readonly Vector2[] CUSTOMER_SERVING_POSITIONS = new Vector2[]
         {
-            new Vector2(200, 200),
-            new Vector2(400, 200),
-            new Vector2(600, 200)
+            new Vector2(200, 100),
+            new Vector2(400, 100),
+            new Vector2(600, 100)
         };
 
         public const int SPACE_BETWEEN_CUSTOMERS = 5;
@@ -43,9 +43,9 @@ namespace Coffee_House.Functionality
         public const int COMBO = 2;
 
         public const double CUSTOMER_SPAWN_INTERVAL = 3;
-        public const double COFFEE_SERVE_TIME = 4;
-        public const double FOOD_SERVE_TIME = 5;
-        public const double COMBO_SERVE_TIME = 9;
+        public const double COFFEE_SERVE_TIME = 12;
+        public const double FOOD_SERVE_TIME = 18;
+        public const double COMBO_SERVE_TIME = 30;
 
         public static readonly string[] COFFEE_TYPES = new string[] { "Coffee", "Coffee", "Coffee" }; //TODO: Add variations
         public static readonly string[] FOOD_TYPES = new string[] { "Food", "Food", "Food" };
