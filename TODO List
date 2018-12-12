@@ -1,0 +1,23 @@
+1. Apply casheer processing function
+
+//Casheer class
+if (*currentCustomer.TravelPoint == 6)
+{
+    Process functionality
+}
+
+//GameMain class
+for (int i = 0; i < casheers.Length; i ++)
+{
+    //If casheers are free and the first person in line is in travlePoint 5
+    if (*casheers[i].CurrentCustomer.TravelPoint == 5)
+    {
+        casheers[i].CurrentCustomer.destinationPosition == Information.CASHEER_POS[i];
+        if (casheers[i].CurrentCustomer.IsAtDestination())
+        {
+               cahseers[i].CurrentCustomer.TravelPoint = 6;
+        }
+    }
+}
+
+2. Apply moving to casheer function
