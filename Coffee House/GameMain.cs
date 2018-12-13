@@ -1,14 +1,7 @@
 ﻿using System;
-using System.IO;
-using System.Linq;
-using System.Collections;
 using System.Collections.Generic;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
-using Microsoft.Xna.Framework.Input;
-using Microsoft.Xna.Framework.Audio;
-using Microsoft.Xna.Framework.Media;
-using Animation2D;
 using Coffee_House.Functionality;
 
 namespace Coffee_House
@@ -241,6 +234,15 @@ namespace Coffee_House
                     if (!casheers[i].IsOccupied && insideQueue.Peek().TravelPoint == 5)
                     {
                         casheers[i].StartProcessing(insideQueue.Dequeue());
+
+                        //Move the queue
+                        insideCurrent = insideQueue.Peek();
+                        insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[0];
+                        for (int c = 0; c < insideQueue.Count - 1; c++)
+                        {
+                            insideCurrent.GetNext().DestinationPosition = insideCurrent.DestinationPosition;
+                            insideCurrent = insideCurrent.GetNext();
+                        }
                     }
                 }
             }
@@ -282,9 +284,28 @@ namespace Coffee_House
             //Move all of the customers outside of the coffee shop
             foreach (Customer customer in processedCustomers)
             {
-                customer.DestinationPosition = new Vector2(0, 500); //TODO: Move to Information
-                customer.Move();
+                switch (customer.TravelPoint)
+                {
+                    case 6:
+                        customer.DestinationPosition = Information.EXIT_POSITION_INSIDE;
+                        customer.Move();
+                        if (customer.IsAtDestination())
+                        {
+                            customer.TravelPoint = 7; //TODO: Magic munber
+                        }
+                        break;
+                    case 7:
+                        customer.DestinationPosition = Information.EXIT_POSITION_OUTSIDE;
+                        customer.Move();
+                        if (customer.IsAtDestination())
+                        {
+                            customer.TravelPoint = 8; //TODO: Magic munber
+                        }
+                        break;
+                }
             }
+
+            
 
             base.Update(gameTime);
         }

@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using Coffee_House.Functionality;
+﻿using Coffee_House.Functionality;
 
 namespace Coffee_House
 {

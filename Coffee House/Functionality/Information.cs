@@ -1,9 +1,4 @@
 ﻿using Microsoft.Xna.Framework;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Coffee_House.Functionality
 {
@@ -30,6 +25,9 @@ namespace Coffee_House.Functionality
             new Vector2(400, 100),
             new Vector2(600, 100)
         };
+
+        public static readonly Vector2 EXIT_POSITION_INSIDE = new Vector2(100, 100);
+        public static readonly Vector2 EXIT_POSITION_OUTSIDE = new Vector2(100, 500);
 
         public const int SPACE_BETWEEN_CUSTOMERS = 5;
 
