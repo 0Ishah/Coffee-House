@@ -3,17 +3,24 @@ using System;
 
 namespace Coffee_House.Functionality
 {
-    class Customer //TODO: Add documentation !!
+    class Customer
     {
         private Customer next;
 
         public int Order { get; }
         public string Name { get; }
         public double CreationTime { get; }
-        public int TimeInQueue { get; set; } = 0;
+        public double TimeInQueue { get; set; } = 0;
         public int TravelPoint { get; set; } = 0;
         public Vector2 DestinationPosition { get; set; }
-        public Vector2 Position { get; private set; } = new Vector2(Information.CUSTOMER_SPAWN_POS.X, Information.CUSTOMER_SPAWN_POS.Y);
+
+        //Customer position is created as a rectangle in order to avoid creating new rectangles when drawing
+        //A separate variable position is created on top of the esisting property to allow editing of the position inside the class
+        private Rectangle position = new Rectangle((int) Information.CUSTOMER_SPAWN_POS.X, (int) Information.CUSTOMER_SPAWN_POS.Y, GameMain.CUSTOMER_REC_WIDTH, GameMain.CUSTOMER_REC_HEIGHT);
+        public Rectangle Position
+        {
+            get { return position; }
+        }
 
         /// <summary>
         /// Default constructor
@@ -52,7 +59,7 @@ namespace Coffee_House.Functionality
         /// <returns></returns>
         public bool IsAtDestination()
         {
-            if (DestinationPosition == Position)
+            if (DestinationPosition.X == Position.X && DestinationPosition.Y == Position.Y)
             {
                 return true;
             }
@@ -66,12 +73,13 @@ namespace Coffee_House.Functionality
         {
             if (!IsAtDestination())
             {
-                Vector2 dir = DestinationPosition - Position;
+                Vector2 dir = new Vector2(DestinationPosition.X - position.X, DestinationPosition.Y - position.Y);
                 dir.Normalize();
                 dir.X = Convert.ToInt32(dir.X);
                 dir.Y = Convert.ToInt32(dir.Y);
 
-                Position += dir * Information.CUSTOMER_MOVE_SPEED;
+                position.X += (int)(dir.X * Information.CUSTOMER_MOVE_SPEED);
+                position.Y += (int)(dir.Y * Information.CUSTOMER_MOVE_SPEED);
             }
         }
     }

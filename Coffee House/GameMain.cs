@@ -15,19 +15,17 @@ namespace Coffee_House
 
 
         private const int SCREEN_WIDTH = 800;
-        private const int SCREEN_HEIGHT = 680;
+        private const int SCREEN_HEIGHT = 480;
 
         // Graphics design elements
         private Rectangle shopRec;
-        private Rectangle[] casheerRec = new Rectangle[3];
 
-        private const int CUSTOMER_REC_WIDTH = 40;
-        private const int CUSTOMER_REC_HEIGHT = 40;
-
-        private List<Rectangle> customersRec = new List<Rectangle>();
+        public const int CUSTOMER_REC_WIDTH = 25;
+        public const int CUSTOMER_REC_HEIGHT = 30;
 
         private Texture2D shopTexture;
         private Texture2D customerTexture;
+        private Texture2D cashierTexture;
 
         private SpriteFont font;
 
@@ -41,7 +39,13 @@ namespace Coffee_House
         private int numCurrentFood;
         private int numCurrentCombo;
 
-        private Casheer[] casheers = new Casheer[3] { new Casheer(), new Casheer(), new Casheer() };
+        private Cashier[] cashiers = new Cashier[] { new Cashier(), new Cashier(), new Cashier() };
+        private Rectangle[] cashierRec = new Rectangle[]
+        {
+            new Rectangle((int)Information.CUSTOMER_SERVING_POSITIONS[0].X, (int)Information.CUSTOMER_SERVING_POSITIONS[0].Y - 90,CUSTOMER_REC_WIDTH,CUSTOMER_REC_HEIGHT),
+            new Rectangle((int)Information.CUSTOMER_SERVING_POSITIONS[1].X, (int)Information.CUSTOMER_SERVING_POSITIONS[1].Y - 90,CUSTOMER_REC_WIDTH,CUSTOMER_REC_HEIGHT),
+            new Rectangle((int)Information.CUSTOMER_SERVING_POSITIONS[2].X, (int)Information.CUSTOMER_SERVING_POSITIONS[2].Y - 90,CUSTOMER_REC_WIDTH,CUSTOMER_REC_HEIGHT)
+        };
 
         private CustomerQueue outsideQueue = new CustomerQueue();
         private CustomerQueue insideQueue = new CustomerQueue();
@@ -52,7 +56,7 @@ namespace Coffee_House
         private double[] customerServeCounter = new double[3];
 
         private Customer outsideCurrent;
-        private Customer insideCurrent; //TODO: Find better place for vars
+        private Customer insideCurrent;
 
         public GameMain()
         {
@@ -84,13 +88,14 @@ namespace Coffee_House
             //CODE HERE
 
             // Initialize design rectangles
-            shopRec = new Rectangle(0, 0, 800, 480);//TODO: Change magic numbers
+            shopRec = new Rectangle(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT);
 
             // Load design textures
             shopTexture = Content.Load<Texture2D>("Sprites/shop");
             customerTexture = Content.Load<Texture2D>("Sprites/customer");
+            cashierTexture = Content.Load<Texture2D>("Sprites/cashier");
 
-            font = Content.Load<SpriteFont>("Fonts/myFont");//TODO: Change name
+            font = Content.Load<SpriteFont>("Fonts/myFont");
         }
 
         //////////////////////////////////////////////////////////////////////////////////
@@ -139,7 +144,7 @@ namespace Coffee_House
                 customerSpawnCounter = 0;
             }
 
-            // Move customers into the inside queue if there are less then 20 peopel inside
+            // Transfer customers into the inside queue if there are less then 20 peopel inside
             if (insideQueue.Count < Information.MAX_PEOPLE_INSIDE && !outsideQueue.IsEmpty() && outsideQueue.Peek().IsAtDestination())
             {
                 insideQueue.Enqueue(outsideQueue.Dequeue());
@@ -150,36 +155,32 @@ namespace Coffee_House
             {
                 outsideCurrent = outsideQueue.Peek();
                 // If the firest element is not ate the destiantion position
-                if (!outsideCurrent.IsAtDestination())
+                if (outsideCurrent.Position.X != Information.OUTSIDE_LINE_START.X || outsideCurrent.Position.Y != Information.OUTSIDE_LINE_START.Y)
                 {
                     // Set the destination position to the start of the line
                     outsideCurrent.DestinationPosition = Information.OUTSIDE_LINE_START;
-                    outsideCurrent.Move();
                 }
                 for (int i = 0; i < outsideQueue.Count - 1; i++)
                 {
                     // Move all the customers except the first to their destanation behind the first
-                    if (!outsideCurrent.GetNext().IsAtDestination())
-                    {
-                        outsideCurrent.GetNext().DestinationPosition = Information.OUTSIDE_LINE_START + new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + 40) * (i + 1), 0); //TODO: Magic numbers
-                        outsideCurrent.GetNext().Move();
-                    }
+                    outsideCurrent.GetNext().DestinationPosition = Information.OUTSIDE_LINE_START + new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + CUSTOMER_REC_WIDTH) * (i + 1), 0);
+
                     outsideCurrent = outsideCurrent.GetNext();
                 }
                 outsideCurrent = null;
             }
 
-            // Move customer in the inside queue
+            // Move customers in the inside queue
             if (!insideQueue.IsEmpty())
             {   
                 insideCurrent = insideQueue.Peek();
                 for (int i = 0; i < insideQueue.Count; i++)
                 {
+                    //Calculate customer position based oont heir position in the line
                     switch (insideCurrent.TravelPoint)
                     {
                         case (0):
                             insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[0];
-                            insideCurrent.Move();
                             if (insideCurrent.IsAtDestination())
                             {
                                 insideCurrent.TravelPoint = 1;
@@ -187,7 +188,6 @@ namespace Coffee_House
                             break;
                         case (1):
                             insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[1];
-                            insideCurrent.Move();
                             if (insideCurrent.IsAtDestination())
                             {
                                 insideCurrent.TravelPoint = 2;
@@ -197,26 +197,23 @@ namespace Coffee_House
                             insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[2];
                             if (i > 10)
                             {
-                                insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[2] - new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + 40) * (i - 10), 0);//TODO: Magic numbers
+                                insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[2] - new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + CUSTOMER_REC_WIDTH) * (i - 10), 0);
                             }
-                            insideCurrent.Move();
-                            if (insideCurrent.IsAtDestination() && i < 10)
+                            if (insideCurrent.Position.X == Information.INSIDE_LINE_TRAVEL_POINTS[2].X && insideCurrent.Position.Y == Information.INSIDE_LINE_TRAVEL_POINTS[2].Y && i < 10)
                             {
                                 insideCurrent.TravelPoint = 3;
                             }
                             break;
                         case (3):
                             insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[3];
-                            insideCurrent.Move();
                             if (insideCurrent.IsAtDestination())
                             {
                                 insideCurrent.TravelPoint = 4;
                             }
                             break;
                         case (4):
-                            insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[4] + new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + 40) * i, 0);//TODO: Magic numbers
-                            insideCurrent.Move();
-                            if (insideCurrent.IsAtDestination())
+                            insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[4] + new Vector2((Information.SPACE_BETWEEN_CUSTOMERS + CUSTOMER_REC_WIDTH) * i, 0);
+                            if (insideCurrent.Position.X == Information.INSIDE_LINE_TRAVEL_POINTS[4].X && insideCurrent.Position.Y == Information.INSIDE_LINE_TRAVEL_POINTS[4].Y)
                             {
                                 insideCurrent.TravelPoint = 5;
                             }
@@ -226,86 +223,100 @@ namespace Coffee_House
                 }
             }
             
-            // Move the customers to the nest avalible casheer
-            if (!insideQueue.IsEmpty())//TOOD: Magic numbers
+            // Move the customers to the next avalible cashier
+            if (!insideQueue.IsEmpty())
             {
-                for (int i = 0; i < casheers.Length; i++)
+                for (int i = 0; i < cashiers.Length; i++)
                 {
-                    if (!casheers[i].IsOccupied && insideQueue.Peek().TravelPoint == 5)
+                    if (!cashiers[i].IsOccupied && insideQueue.Peek().TravelPoint == 5)
                     {
-                        casheers[i].StartProcessing(insideQueue.Dequeue());
-
-                        //Move the queue
-                        insideCurrent = insideQueue.Peek();
-                        insideCurrent.DestinationPosition = Information.INSIDE_LINE_TRAVEL_POINTS[0];
-                        for (int c = 0; c < insideQueue.Count - 1; c++)
-                        {
-                            insideCurrent.GetNext().DestinationPosition = insideCurrent.DestinationPosition;
-                            insideCurrent = insideCurrent.GetNext();
-                        }
+                        cashiers[i].StartProcessing(insideQueue.Dequeue());
                     }
                 }
             }
 
-            // Update all fo the casheers
+            // Update all fo the cashiers
             if (simulationUpdateCounter >= SIMULATION_UPDATE_TIME)
             {
-                for (int i = 0; i < casheers.Length; i++)
+                for (int i = 0; i < cashiers.Length; i++)
                 {
-                    if (casheers[i].IsOccupied)
+                    if (cashiers[i].IsOccupied)
                     {
-                        if (casheers[i].CurrentCustomer.TravelPoint == 6)//TODO: Magic numbers
+                        //Process customer if in seving location
+                        if (cashiers[i].CurrentCustomer.TravelPoint == 6)
                         {
-                            casheers[i].Process();
+                            cashiers[i].Process();
                         }
-                        if (!casheers[i].IsOccupied && casheers[i].ContainsCustomer())
+                        //Remove customer from the cashier
+                        if (!cashiers[i].IsOccupied && cashiers[i].ContainsCustomer())
                         {
-                            processedCustomers.Add(casheers[i].CurrentCustomer);
+                            cashiers[i].CurrentCustomer.TimeInQueue = currentSimulationTime - cashiers[i].CurrentCustomer.CreationTime;
+                            processedCustomers.Add(cashiers[i].CurrentCustomer);
                         }
                     }
                 }
                 simulationUpdateCounter = 0;
             }
 
-            //Move customers to the casheer serving area graphically
-            for (int i = 0; i < casheers.Length; i++)
+            //Move customers to the cashier serving area graphically
+            for (int i = 0; i < cashiers.Length; i++)
             {
-                if (casheers[i].IsOccupied && casheers[i].CurrentCustomer.TravelPoint == 5)//TODO: Magic numbers
+                if (cashiers[i].IsOccupied && cashiers[i].CurrentCustomer.TravelPoint == 5)
                 {
-                    casheers[i].CurrentCustomer.DestinationPosition = Information.CUSTOMER_SERVING_POSITIONS[i];
-                    casheers[i].CurrentCustomer.Move();
-                    if (casheers[i].CurrentCustomer.IsAtDestination())
+                    cashiers[i].CurrentCustomer.DestinationPosition = Information.CUSTOMER_SERVING_POSITIONS[i];
+                    if (cashiers[i].CurrentCustomer.IsAtDestination())
                     {
-                        casheers[i].CurrentCustomer.TravelPoint = 6;
+                        cashiers[i].CurrentCustomer.TravelPoint = 6;
                     }
                 }
             }
 
-            //Move all of the customers outside of the coffee shop
+            //Move processed customer outside of the coffe shop
             foreach (Customer customer in processedCustomers)
             {
                 switch (customer.TravelPoint)
                 {
                     case 6:
                         customer.DestinationPosition = Information.EXIT_POSITION_INSIDE;
-                        customer.Move();
                         if (customer.IsAtDestination())
                         {
-                            customer.TravelPoint = 7; //TODO: Magic munber
+                            customer.TravelPoint = 7;
                         }
                         break;
                     case 7:
                         customer.DestinationPosition = Information.EXIT_POSITION_OUTSIDE;
-                        customer.Move();
                         if (customer.IsAtDestination())
                         {
-                            customer.TravelPoint = 8; //TODO: Magic munber
+                            customer.TravelPoint = 8;
                         }
                         break;
                 }
             }
 
-            
+            //Move all of the customers in a simulation
+            outsideCurrent = outsideQueue.Peek();
+            for (int i = 0; i < outsideQueue.Count; i++)
+            {
+                outsideCurrent.Move();
+                outsideCurrent = outsideCurrent.GetNext();
+            }
+            insideCurrent = insideQueue.Peek();
+            for (int i = 0; i < insideQueue.Count; i++)
+            {
+                insideCurrent.Move();
+                insideCurrent = insideCurrent.GetNext();
+            }
+            foreach (Cashier cashier in cashiers)
+            {
+                if (cashier.ContainsCustomer())
+                {
+                    cashier.CurrentCustomer.Move();
+                }
+            }
+            foreach (Customer customer in processedCustomers)
+            {
+                customer.Move();
+            }
 
             base.Update(gameTime);
         }
@@ -328,8 +339,8 @@ namespace Coffee_House
                 outsideCurrent = outsideQueue.Peek();
                 for (int i = 0; i < outsideQueue.Count; i++)
                 {
-                    spriteBatch.Draw(customerTexture, new Rectangle((int)outsideCurrent.Position.X, (int)outsideCurrent.Position.Y, 40, 40), Color.White); //TODO: Magic mumbers and ugly
-                    spriteBatch.DrawString(font, outsideCurrent.Name, outsideCurrent.Position + new Vector2(0,40), Color.Purple); //TODO: Move new vector 2 to info as displacement var
+                    spriteBatch.Draw(customerTexture, outsideCurrent.Position, Color.White);
+                    spriteBatch.DrawString(font, outsideCurrent.Name, ToVector2(outsideCurrent.Position) + Information.CUSTOMER_NAME_OFFSET , Color.Purple);
                     outsideCurrent = outsideCurrent.GetNext();
                 }
                 outsideCurrent = null;
@@ -341,28 +352,37 @@ namespace Coffee_House
                 insideCurrent = insideQueue.Peek();
                 for (int i = 0; i < insideQueue.Count; i++)
                 {
-                    spriteBatch.Draw(customerTexture, new Rectangle((int)insideCurrent.Position.X, (int)insideCurrent.Position.Y, 40, 40), Color.White); //TODO: Magic mumbers and ugly
-                    spriteBatch.DrawString(font, insideCurrent.Name, insideCurrent.Position + new Vector2(0, 40), Color.Purple);
+                    spriteBatch.Draw(customerTexture, insideCurrent.Position, Color.White);
+                    spriteBatch.DrawString(font, insideCurrent.Name, ToVector2(insideCurrent.Position) + Information.CUSTOMER_NAME_OFFSET, Color.Purple);
                     insideCurrent = insideCurrent.GetNext();
                 }
                 insideCurrent = null;
             }
 
             // Draw customers that are being served
-            for (int i = 0; i < casheers.Length; i++)
+            for (int i = 0; i < cashiers.Length; i++)
             {
-                if (casheers[i].IsOccupied && casheers[i].ContainsCustomer())
+                if (cashiers[i].IsOccupied && cashiers[i].ContainsCustomer())
                 {
-                    spriteBatch.Draw(customerTexture, new Rectangle((int)casheers[i].CurrentCustomer.Position.X, (int)casheers[i].CurrentCustomer.Position.Y, 40, 40), Color.White);
-                    spriteBatch.DrawString(font, casheers[i].CurrentCustomer.Name, casheers[i].CurrentCustomer.Position + new Vector2(0, 40), Color.Purple);
-                    spriteBatch.DrawString(font, Math.Round(casheers[i].CurrentProcessTime,2).ToString(), casheers[i].CurrentCustomer.Position + new Vector2(0,48), Color.Red);
+                    spriteBatch.Draw(customerTexture, cashiers[i].CurrentCustomer.Position, Color.White);
+                    spriteBatch.DrawString(font, cashiers[i].CurrentCustomer.Name, ToVector2(cashiers[i].CurrentCustomer.Position) + Information.CUSTOMER_NAME_OFFSET, Color.Purple);
+                    spriteBatch.DrawString(font, Math.Round(cashiers[i].CurrentProcessTime,2).ToString(), ToVector2(cashiers[i].CurrentCustomer.Position) + Information.CUSTOMER_ORDER_TIME_OFFSET, Color.Green);
                 }
             }
 
-            //Draw exiting customers
+            //Draw exiting customers while they are on the screen
             foreach (Customer customer in processedCustomers)
             {
-                spriteBatch.Draw(customerTexture, new Rectangle((int)customer.Position.X, (int)customer.Position.Y, 40, 40), Color.White);
+                if (customer.Position.Y < SCREEN_HEIGHT)
+                {
+                    spriteBatch.Draw(customerTexture, customer.Position, Color.White);
+                }
+            }
+
+            //Draw cashiers
+            for (int i = 0; i < cashiers.Length; i++)
+            {
+                spriteBatch.Draw(cashierTexture, cashierRec[i], Color.White);
             }
 
             spriteBatch.End();
@@ -372,5 +392,15 @@ namespace Coffee_House
         //////////////////////////////////////////////////////////////////////////////////
         /////////////                     OTHER                           ////////////////
         //////////////////////////////////////////////////////////////////////////////////
+
+        /// <summary>
+        /// Converts a recatngle to a vector2
+        /// </summary>
+        /// <param name="rectangle"></param>
+        /// <returns></returns>
+        public Vector2 ToVector2(Rectangle rectangle)
+        {
+            return new Vector2(rectangle.X, rectangle.Y);
+        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Coffee_House
 {
-    class Casheer
+    class Cashier
     {
         public bool IsOccupied { get; private set; } = false;
         public double CurrentProcessTime { get; private set; } = 0;
@@ -18,7 +18,7 @@ namespace Coffee_House
         }
 
         /// <summary>
-        /// Adds a new customer to casheer and updates service time requirements
+        /// Adds a new customer to cashier and updates service time requirements
         /// </summary>
         /// <param name="newCustomer">New Customer</param>
         public void StartProcessing(Customer newCustomer)
@@ -42,7 +42,7 @@ namespace Coffee_House
 
         /// <summary>
         /// Adds a second to the processing timer
-        /// If the timer runs out, sets the casheer to not occupied
+        /// If the timer runs out, sets the cashier to not occupied
         /// </summary>
         public void Process()
         {
