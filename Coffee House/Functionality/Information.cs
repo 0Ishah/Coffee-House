@@ -34,6 +34,21 @@ namespace Coffee_House.Functionality
         public static readonly Vector2 CUSTOMER_NAME_OFFSET = new Vector2(0, 30);
         public static readonly Vector2 CUSTOMER_ORDER_TIME_OFFSET = new Vector2(0, 38);
 
+        public static readonly Vector2 SIMULATION_TIME_POSITION = new Vector2(10,150);
+        public static readonly Vector2 TOTAL_CUSTOMERS_POSITION = new Vector2(10, 160);
+        public static readonly Vector2 AVERAGE_WAIT_TIME_POSITION = new Vector2(10,170);
+        public static readonly Vector2 MAX_WAIT_TIME_POSITION = new Vector2(10,180);
+        public static readonly Vector2 MIN_WAIT_TIME_POSITION = new Vector2(10,190);
+        public static readonly Vector2[] TOP_WAIT_TIME_POSITION = new Vector2[]
+        {
+            new Vector2(10,200),
+            new Vector2(10,210),
+            new Vector2(10,220),
+            new Vector2(10,230),
+            new Vector2(10,240)
+        };
+        public static readonly Vector2 END_TEXT_POSITION = new Vector2(10, 260);
+
         public const int SPACE_BETWEEN_CUSTOMERS = 20;
 
         public const int CUSTOMER_MOVE_SPEED = 1;
